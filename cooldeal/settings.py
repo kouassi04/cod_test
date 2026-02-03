@@ -53,15 +53,14 @@ except ImportError:
 # Application definition
 
 INSTALLED_APPS = [
-    # "admin_interface",
-    # "colorfield",
+     "admin_interface",
+    "colorfield",
     'django_daisy',
     'django.contrib.admin',
     'django.contrib.humanize',
 
     "sslserver",
     "django_admin_generator",
-    # 'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -79,7 +78,7 @@ INSTALLED_APPS = [
     'site_config.apps.SiteConfigConfig',
     'website.apps.WebsiteConfig',
     'client.apps.ClientConfig',
-    'django_cron',
+    #'django_cron',
 ]
 
 MIDDLEWARE = [

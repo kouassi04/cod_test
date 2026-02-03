@@ -117,7 +117,10 @@ def inscription(request):
     else:
         ville = None
 
-    if username is not None and nom is not None and password is not None and email is not None and phone is not None and passwordconf is not None:
+    # --- CORRECTION DE SÉCURITÉ (TEST TC-ADV-02) ---
+    # On vérifie si les variables contiennent du texte (et pas juste "is not None")
+    # Une chaine vide "" renverra False ici, ce qui bloque l'inscription vide.
+    if username and nom and password and email and phone and passwordconf:
         is_email = False
         try:
             validate_email(email)
@@ -146,7 +149,7 @@ def inscription(request):
                     profile.ville = ville
                     profile.adresse = adresse
                     profile.save()
-                    if request.FILES['file']:
+                    if request.FILES.get('file'): # Utilisation de .get pour éviter erreur si pas de fichier
 
                         image = request.FILES['file']
                         profile.photo = image
@@ -157,9 +160,9 @@ def inscription(request):
                         login_request(request, user)
                         message = "Votre Compte a été créé avec succès"
                         issuccess = True
-                except Exception as _:
-
-                    message = "Un utilisateur avec le même email ou username existe déjà"
+                except Exception as e:
+                    # Ajout du détail de l'erreur pour le debug (optionnel)
+                    message = f"Un utilisateur avec le même email ou username existe déjà"
                     issuccess = False
         else:
 
@@ -167,7 +170,7 @@ def inscription(request):
             issuccess = False
     else:
 
-        message = 'Merci de vérifier vos informations'
+        message = 'Merci de vérifier vos informations (Champs vides)'
         issuccess = False
 
     datas = {
@@ -185,9 +188,22 @@ def add_to_cart(request):
 
     panier = postdata['panier']
     produit = postdata['produit']
-    quantite = postdata['quantite']
+    # On convertit en entier pour pouvoir comparer
+    try:
+        quantite = int(postdata['quantite'])
+    except (ValueError, TypeError):
+        quantite = 0
+
+    # --- CORRECTION DE SÉCURITÉ (TEST TC-ADV-03) ---
+    # On bloque les quantités négatives ou nulles
+    if quantite <= 0:
+        return JsonResponse({
+            'message': "La quantité doit être supérieure à 0",
+            'success': False
+        }, safe=False)
+
     isSuccess = False
-    if panier is not None and produit is not None and quantite is not None:
+    if panier is not None and produit is not None:
         panier = models.Panier.objects.get(id=panier)
         produit = shop_models.Produit.objects.get(id=produit)
         try:
