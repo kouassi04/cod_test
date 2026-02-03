@@ -13,12 +13,10 @@ def setup_django_environment():
     
     base_dir = Path(__file__).resolve().parent
     
-    #
+    # On remonte d'un cran pour trouver 'cod_test'
     project_path = base_dir.parent
     
-    
     sys.path.insert(0, str(project_path))
-    
     
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'cooldeal.settings')
     try:
@@ -44,11 +42,9 @@ def run_tests_in_folder(folder_name, title):
     # Vérification que le dossier existe
     if not start_dir.exists():
         print(f"⚠️  Dossier de test introuvable : {folder_name}")
-        print(f"   (Vérifiez que vous avez bien renommé le dossier '{folder_name.replace('t_', '')}' en '{folder_name}')")
         return None
 
     # Découverte automatique : Il va trouver TOUS les fichiers commençant par 'test_'
-    # Par exemple pour t_shop, il lancera test_shop_models.py ET test_shop_views.py
     suite = loader.discover(start_dir, pattern='test_*.py')
     
     # Lancement des tests
@@ -84,6 +80,9 @@ if __name__ == "__main__":
 
     # --- MODULE CONTACT (Formulaires) ---
     run_tests_in_folder("t_contact", "CONTACT (Messagerie, Newsletter)")
+
+    # --- MODULE VALIDATION (Nouveau : Boundary Testing) ---
+    run_tests_in_folder("t_validation", "VALIDATION & LIMITES (Tests Techniques)")
 
     print("\n" + "="*50)
     print("✅ FIN DE L'EXÉCUTION DE TOUS LES TESTS")
